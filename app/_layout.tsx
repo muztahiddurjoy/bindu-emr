@@ -1,7 +1,7 @@
 import '~/global.css';
 
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import { Appearance, Platform, View } from 'react-native';
@@ -10,6 +10,10 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import LoginScreen from './(auth)/login/_layout';
+import RegisterScreen from './(auth)/register/_layout';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -34,6 +38,18 @@ const usePlatformSpecificSetup = Platform.select({
 export default function RootLayout() {
   usePlatformSpecificSetup();
   const { isDarkColorScheme } = useColorScheme();
+  const Tab = createBottomTabNavigator();
+
+  React.useLayoutEffect(() => {
+    AsyncStorage.getItem('accessToken').then((token) => {
+      if(!token){
+        router.push('/(auth)/login');
+      }
+      else{
+        router.push('/dashboard');
+      }
+    })
+  }, [])
 
   return (
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
@@ -42,10 +58,45 @@ export default function RootLayout() {
         <Stack.Screen
           name='index'
           options={{
-            title: 'Starter Base',
-            headerRight: () => <ThemeToggle />,
+            headerShown: false,
           }}
         />
+        <Stack.Screen
+          name='(auth)/login'
+          options={{
+            headerShown: false,
+          }}
+          />
+        <Stack.Screen
+          name='(auth)/register'
+          options={{
+            headerShown: false,
+          }}
+          />
+          <Stack.Screen
+          name='add-family-member'
+          options={{
+            headerShown: false,
+          }}
+          />
+          <Stack.Screen
+          name='add-ticket'
+          options={{
+            headerShown: false,
+          }}
+          />
+          <Stack.Screen
+          name='otp-verify'
+          options={{
+            headerShown: false,
+          }}
+          />
+          <Stack.Screen
+          name='tickets'
+          options={{
+            headerShown: false,
+          }}
+          />
       </Stack>
       <PortalHost />
     </ThemeProvider>
